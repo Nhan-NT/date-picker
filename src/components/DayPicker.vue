@@ -65,9 +65,8 @@ export default  {
         prevDateVisible = this.prevMonthDays.slice(this.prevMonthDays.length - newValue[0].getDay() , this.prevMonthDays.length)
       }
       let totalDate = prevDateVisible.concat(this.days)
-      let nextDateVisible = this.prevMonthDays.slice(0, totalPanelVisible - totalDate.length)
-      let finalDates = totalDate.concat(nextDateVisible)
-      this.dates = finalDates
+      let nextDateVisible = this.nextMonthDays.slice(0, totalPanelVisible - totalDate.length)
+      this.dates = totalDate.concat(nextDateVisible)
     },
   }
 }

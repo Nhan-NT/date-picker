@@ -58,7 +58,10 @@ export default  {
     this.getDayInMonth();
     this.getDayInPrevMonth();
     this.getDayInNextMonth();
-    this.initDate()
+    if(this.dateValue && this.dateValue !== '') {
+      this.initDate()
+
+    }
   },
   methods : {
     handleYear(action) {
@@ -123,9 +126,8 @@ export default  {
       this.formatDate(date)
     },
     formatDate(dateValue) {
-      console.log("dateValue", dateValue)
       let date = dateValue.getDate()
-      let month = dateValue.getMonth()
+      let month = dateValue.getMonth() + 1
       let year = dateValue.getFullYear()
       if(date < 10) {
         date = `0${date}`
@@ -148,8 +150,11 @@ export default  {
       this.getDayInPrevMonth()
       this.getDayInNextMonth();
     },
-    dateValue() {
-      this.initDate()
+    dateValue(val) {
+      if(val && val !== '') {
+        this.initDate()
+
+      }
     }
   }
 
