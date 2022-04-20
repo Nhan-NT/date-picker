@@ -1,18 +1,24 @@
 <template>
-  <DateInput :dateValue="date"/>
+  <date-picker :dateValue="date" :handleChange="handleChange"/>
 </template>
 
 <script>
 
-import DateInput from "@/components/DateInput";
+import DatePicker from "@/components/DatePicker";
 export default {
+  name: 'App',
+  components: {DatePicker},
   data() {
     return {
-    date : ""
+    date : "11/10/2022"
     }
   },
-  name: 'App',
-  components: {DateInput},
+  methods : {
+    handleChange(dateString, date) {
+      console.log(dateString, date)
+    }
+  },
+
 }
 </script>
 

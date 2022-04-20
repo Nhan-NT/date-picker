@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build-library" : "vue-cli-service build --target lib --name nhan-date-picker ./src/install.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -46,5 +47,7 @@
     "last 2 versions",
     "not dead",
     "not ie 11"
-  ]
+  ],
+  "main" : ".dist/nhan-date-picker.common.js",
+  "files": ["dist/*"]
 }

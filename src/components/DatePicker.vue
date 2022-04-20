@@ -1,31 +1,41 @@
 <template>
-  <input type="text" placeholder="Select Date..." v-model="chooseDate">
-  <div class="date-choose-popup">
+  <div class="date-input">
+    <input type="text" placeholder="Select Date..." v-model="selectedDate">
+    <i class="fa-solid fa-calendar-day" @click="isPanelOpen = !isPanelOpen"></i>
+  </div>
+  <div class="date-choose-popup" v-show="isPanelOpen">
     <div class="picker-value">
       <i class="fa-solid fa-angles-left" @click="handleYear('prev')"></i>
       <i class="fa-solid fa-chevron-left" @click="handlePrevMonth"></i>
       <div class="info-picker">
-        <span class="month-value">{{renderMonthLabel(month !== 12 ? month + 1 : 1)}}</span>
-        <span class="date-value">{{year}}</span>
+        <span class="month-value" @click="handleSelectMonth">{{renderMonthLabel(month)}}</span>
+        <span class="year-value">{{year}}</span>
       </div>
 
       <i class="fa-solid fa-chevron-right" @click="handleNextMonth"></i>
       <i class="fa-solid fa-angles-right" @click="handleYear('next')"></i>
     </div>
-    <day-picker :days="days" :prevMonthDays="prevMonthDays" :selectedDate="selectedDate" :nextMonthDays="nextMonthDays" @setChooseDate="setChooseDate"/>
+    <month-picker v-show="isPickerMonth" @setSelectedMonth="setSelectedMonth"/>
+    <day-picker v-show="isPickerMonth === false" :days="days" :prevMonthDays="prevMonthDays" :selectedDate="selectedDate" :nextMonthDays="nextMonthDays" @setSelectedDate="setSelectedDate"/>
   </div>
 </template>
 
 <script>
 import DateMixins from "@/mixins/DateMixins.js"
 import DayPicker from "@/components/DayPicker";
+import {firstMonthInYear, formatDate, getDaysInMonth, lastMonthInYear} from "@/utils/dateUtils";
+import MonthPicker from "@/components/MonthPicker";
 export default  {
-  components: {DayPicker},
+  components: {MonthPicker, DayPicker},
   mixins : [DateMixins],
   props : {
     dateValue : {
       type : String,
       defaultValue : ''
+    },
+    handleChange : {
+      type : Function,
+      defaultValue: () => {}
     }
   },
   data() {
@@ -35,8 +45,11 @@ export default  {
       days : [],
       prevMonthDays : [],
       nextMonthDays : [],
-      chooseDate : '',
-      selectedDate : "",
+      selectedDate : '',
+      isPanelOpen : false,
+      pickedDate : '',
+      isPickerMonth : false,
+      keyValue : 1,
     }
   },
   computed : {
@@ -68,75 +81,52 @@ export default  {
       action === 'prev' ? this.year -- : this.year++
     },
     initDate() {
-      this.chooseDate = this.dateValue
-      const values = this.chooseDate.split('/')
-      this.month = parseInt(values[1]) - 1
+      this.selectedDate = this.dateValue
+      const values = this.selectedDate.split('/')
+      this.month = parseInt(values[1])
       this.year = parseInt(values[2])
-      this.selectedDate = this.chooseDate
     },
     handlePrevMonth() {
-      if(this.month === 1) {
-        this.month = 12
+      if(this.month === firstMonthInYear) {
+        this.month = lastMonthInYear
         this.year --
       }else{
         this.month --
       }
     },
     handleNextMonth(){
-      if(this.month === 12) {
-        this.month = 1
+      if(this.month === lastMonthInYear) {
+        this.month = firstMonthInYear
         this.year ++
       }else{
         this.month ++
       }
     },
     getDayInMonth(){
-      const currentMonth = this.month === 12 ? 0 : this.month
-      const date = new Date(Date.UTC(this.year, this.month, 1));
-      let days = [];
-      while (date.getUTCMonth() === currentMonth) {
-        days.push(new Date(date));
-        date.setUTCDate(date.getUTCDate() + 1);
-      }
-      this.days = days
+      this.days =  getDaysInMonth(this.month,this.year )
     },
     getDayInPrevMonth () {
-      let prevMonth = this.month === 1 ? 0 : this.month - 1
-      let year = this.month === 1 ?this.year - 1: this.year
-      const date = new Date(Date.UTC(year, prevMonth, 1));
-      let days = [];
-      while (date.getUTCMonth() === prevMonth) {
-        days.push(new Date(date));
-        date.setUTCDate(date.getUTCDate() + 1);
-      }
-      this.prevMonthDays = days
+      const prevMonth = this.month === firstMonthInYear ? lastMonthInYear : this.month - 1
+      const year = this.month === firstMonthInYear ? this.year - 1 : this.year
+      this.prevMonthDays = getDaysInMonth(prevMonth, year)
     },
     getDayInNextMonth () {
-      let prevMonth = this.month === 12 ? 1 : this.month === 11 ? 0 : this.month + 1
-      let year = this.month === 12 ?this.year + 1: this.year
-      const date = new Date(Date.UTC(year, prevMonth, 1));
-      let days = [];
-      while (date.getUTCMonth() === prevMonth) {
-        days.push(new Date(date));
-        date.setUTCDate(date.getUTCDate() + 1);
-      }
-      this.nextMonthDays = days
+      const nextMonth = this.month === lastMonthInYear ? firstMonthInYear : this.month + 1
+      const year = this.month === lastMonthInYear ? this.year + 1 : this.year
+      this.nextMonthDays = getDaysInMonth(nextMonth, year)
+
     },
-    setChooseDate(date) {
-      this.formatDate(date)
+    setSelectedDate(date) {
+      this.selectedDate = formatDate(date)
+      this.pickedDate = date
     },
-    formatDate(dateValue) {
-      let date = dateValue.getDate()
-      let month = dateValue.getMonth() + 1
-      let year = dateValue.getFullYear()
-      if(date < 10) {
-        date = `0${date}`
-      }
-      if(month < 10) {
-        month = `0${month}`
-      }
-      this.chooseDate = `${date}/${month}/${year}`
-      this.selectedDate = this.chooseDate
+    handleSelectMonth() {
+      this.isPickerMonth = true
+      this.month = ''
+    },
+    setSelectedMonth(month) {
+      this.month = month
+      this.isPickerMonth = false
     }
   },
   watch : {
@@ -155,12 +145,27 @@ export default  {
         this.initDate()
 
       }
+    },
+    pickedDate(val){
+      this.handleChange(formatDate(val), val)
     }
   }
 
 }
 </script>
 <style lang="scss" scoped>
+  .fa-calendar-day {
+    color : rgba(90,90,90,0.87);
+    position: absolute;
+    right: 20px;
+    font-size: 12px;
+    top: 4px;
+    cursor: pointer;
+  }
+  .date-input{
+    width: 200px;
+    position : relative;
+  }
   .date-choose-popup {
     width: 200px;
     height : 200px;
