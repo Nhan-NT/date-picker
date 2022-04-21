@@ -1,6 +1,6 @@
 <template>
   <div class="month-picker">
-    <p class="month-item" v-for="month in months" :key="month.label" @click="setSelectedMonth(month.value)">{{month.label}}</p>
+    <p class="month-item" v-for="month in months" :key="month.label" :class="currentMonth === month.value && 'active-month'" @click="setSelectedMonth(month.value)">{{month.label}}</p>
   </div>
 </template>
 <script>
@@ -8,6 +8,12 @@
 
   export default {
     mixins : [DateMixins],
+    props  : {
+      currentMonth : {
+        type : String,
+        default : () => ''
+      }
+    },
     methods : {
       setSelectedMonth(month) {
         this.$emit("setSelectedMonth", month)
@@ -29,7 +35,9 @@
       &:hover {
         background: rgba(197, 255, 236, 0.87);
       }
-
+    }
+    .active-month {
+      background: rgba(197, 255, 236, 0.87);
     }
   }
 

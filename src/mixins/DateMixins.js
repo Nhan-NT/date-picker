@@ -50,7 +50,7 @@ export default {
                     label : 'Dec',
                     value : 12,
                 }
-            ]
+            ],
         }
-    }
+    },
 }

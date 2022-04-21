@@ -13,11 +13,6 @@ export default {
     date : "11/10/2022"
     }
   },
-  methods : {
-    handleChange(dateString, date) {
-      console.log(dateString, date)
-    }
-  },
 
 }
 </script>

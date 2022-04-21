@@ -1,6 +1,7 @@
 export const totalPanelVisible = 42
 export const firstMonthInYear = 1
 export const lastMonthInYear = 12
+export const totalYearPanel = 12
 const getDaysInMonth = (month, year) => {
     const date = new Date(year, month - 1, 1);
     let days = [];
